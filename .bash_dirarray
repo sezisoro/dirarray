@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Location of array file.
+DIRARRFILE="$HOME/.cache/dirs"
+
+# Max number of directories in the array (max lines)
+DIRARRSIZE=20
+
+# Create file if non-existent.
+if [[ ! -f "$DIRARRFILE" ]]; then
+  echo "$HOME" > "$DIRARRFILE"
+fi
+
+# Inserts a string into the beginning of the dirarray.
+insert_dirarray () {
+  sed -i "1 i$1" $DIRARRFILE
+
+  dirlen=$(wc -l < $DIRARRFILE)
+
+  # Truncate the file if it's greater than the max length.
+  if [[ "$dirlen" -gt "$DIRARRSIZE" ]]; then
+    sed -i '21,$ d' $DIRARRFILE
+  fi
+  return 0 
+}
+
+print_dirarray () {
+  awk '{print i++,$0}' OFS=" -- " $DIRARRFILE
+}
+
+index_dirarray () {
+  # Thanks, rici, from SO.
+  # Because of index-by-1 when we want to index-by-zero.
+  index=$(($1 + 1))
+  echo $(tail -n+$index $DIRARRFILE | head -n1)
+  return 0
+}
+
+cds () {
+  # use "cds -" to print array.
+  if [[ "$1" == "-" ]]; then
+    print_dirarray  
+  # use "cds -n" for some integer in the array to cd to it quickly.
+  elif [[ $1 =~ ^-[0-9]+$ ]]; then
+    # Strip the hyphen from the input.
+    index=${1:1}
+    # Check bounds.
+
+    dirlen=$(wc -l < $DIRARRFILE)
+    if [[ "$index" -gt 0 ]] &&                # No negative numbers.
+       [[ "$index" -lt "$dirlen" ]] &&        # For the case of a fresh array.
+       [[ "$index" -lt "$DIRARRSIZE" ]]; then # General catch-all.
+      # Lookup the index.
+      dir=$(index_dirarray $index)
+      # Re-add it to the array, so it appears at the top.
+      $(insert_dirarray $dir)
+      # Then just cd to the path.
+      cd $dir
+      return 0
+    else
+      echo "Error: index out of bounds"
+      return 1
+    else
+      echo "Error: index out of bounds"
+      return 1
+    fi
+  # use "cds PATH" to just cd to the path, and add it to the array.
+  else
+    cd $1
+    # As long as the cd was successful, insert it into the array.
+    if [[ $? -eq 0 ]]; then
+      $(insert_dirarray $1)
+    fi
+  fi
+}
