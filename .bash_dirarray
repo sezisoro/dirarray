@@ -60,9 +60,6 @@ cds () {
     else
       echo "Error: index out of bounds"
       return 1
-    else
-      echo "Error: index out of bounds"
-      return 1
     fi
   # use "cds PATH" to just cd to the path, and add it to the array.
   else
