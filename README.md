@@ -1,5 +1,5 @@
 # dirarray
-A bash script to have a directory history similar to the dirstack in ZSH.
+A better form of dirstack.
 ###Description
 The command to use this feature is ```cds```. In most cases, you can use it just as ```cd``` and you can alias it to ```cd``` in your shell. Where this program shines is every time you cd to a directory, a file (loc: ```~/.cache/dirs```) is updated with the last location moved to, and you can view this as a list with ```cds -``` or navigate to one of the listed options with ```cds -n``` where n is a number within list bounds.
 ###Installation
