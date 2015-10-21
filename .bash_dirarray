@@ -47,7 +47,7 @@ cds () {
     # Check bounds.
 
     dirlen=$(wc -l < $DIRARRFILE)
-    if [[ "$index" -gt 0 ]] &&                # No negative numbers.
+    if [[ "$index" -ge 0 ]] &&                # No negative numbers.
        [[ "$index" -lt "$dirlen" ]] &&        # For the case of a fresh array.
        [[ "$index" -lt "$DIRARRSIZE" ]]; then # General catch-all.
       # Lookup the index.
@@ -66,7 +66,8 @@ cds () {
     cd $1
     # As long as the cd was successful, insert it into the array.
     if [[ $? -eq 0 ]]; then
-      $(insert_dirarray $1)
+      dir=$(readlink -f .)
+      $(insert_dirarray $dir)
     fi
   fi
 }
